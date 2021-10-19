@@ -1,0 +1,14 @@
+# Dependency directories
+node_modules/
+
+# vscode files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+config.js
+config.json
+config.*

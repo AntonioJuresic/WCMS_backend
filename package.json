@@ -1,0 +1,22 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend za moj zavrsni rad",
+  "main": "server.js",
+  "scripts": {
+    "test": "console.log(\"test\")"
+  },
+  "author": "Antonio Juresic",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.3",
+    "nodemailer": "^6.7.0",
+    "path": "^0.12.7",
+    "promise-mysql": "^5.0.3",
+    "uuid": "^8.3.2"
+  }
+}
