@@ -1,4 +1,6 @@
 const authenticationRouter = require("./routes/api-authentication");
+const authorityRouter = require("./routes/api-authority");
+const invitationRouter = require("./routes/api-invitations")
 
 const infoRouter = require("./routes/api-info");
 
@@ -11,8 +13,6 @@ const categoryPostsRouter = require("./routes/api-category-posts");
 const userRouter = require("./routes/api-user");
 const userPostsRouter = require("./routes/api-user-posts");
 const userCommentRouter = require("./routes/api-user-comments");
-
-const invitationRouter = require("./routes/api-invitations")
 
 const commentRouter = require("./routes/api-comments");
 
@@ -27,6 +27,8 @@ module.exports = (express, connectionPool) => {
         });
 
     apiRouter.use("/authentication", authenticationRouter(express, connectionPool));
+    apiRouter.use("/authority", authorityRouter(express, connectionPool));
+    apiRouter.use("/invitation", invitationRouter(express, connectionPool));
 
     apiRouter.use("/info", infoRouter(express, connectionPool));
 
@@ -40,8 +42,6 @@ module.exports = (express, connectionPool) => {
     apiRouter.use("/user-posts", userPostsRouter(express, connectionPool));
     apiRouter.use("/user-comments", userCommentRouter(express, connectionPool));
     //apiRouter.use("/user-himself", userHimselfRouter(express, connectionPool));
-
-    apiRouter.use("/invitation", invitationRouter(express, connectionPool));
 
     apiRouter.use("/comment", commentRouter(express, connectionPool));
     
