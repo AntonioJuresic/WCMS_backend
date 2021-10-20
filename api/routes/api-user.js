@@ -116,9 +116,10 @@ module.exports = function (express, connectionPool) {
                 let databaseConnection = await connectionPool.getConnection();
 
                 let querySelectStatement =
-                    "SELECT id, username, email, imagePath, " +
-                    "dateOfCreation, deleted " +
+                    "SELECT user.id AS 'id', username, email, imagePath, " +
+                    "dateOfCreation, deleted, authority.title AS 'authorityTitle' " +
                     "FROM user " +
+                    "INNER JOIN authority ON user.authorityId = authority.id " +
                     "ORDER BY dateOfCreation ASC;";
 
                 let selectedUsers = await databaseConnection.query(querySelectStatement);
@@ -139,8 +140,10 @@ module.exports = function (express, connectionPool) {
                 let databaseConnection = await connectionPool.getConnection();
 
                 let querySelectStatement =
-                    "SELECT id, username, email, imagePath, " +
-                    "dateOfCreation, deleted FROM user " +
+                    "SELECT user.id AS 'id', username, email, imagePath, " +
+                    "dateOfCreation, deleted, authority.title AS 'authorityTitle' " +
+                    "FROM user " +
+                    "INNER JOIN authority ON user.authorityId = authority.id " +
                     "WHERE user.id = ?;";
 
                 let selectedUser = await databaseConnection.query(querySelectStatement, req.params.id);
@@ -183,7 +186,8 @@ module.exports = function (express, connectionPool) {
                     imagePath: imagePath,
                     password: hash.toString("hex"),
                     dateOfCreation: dateISOToMySQL(Date.now()),
-                    deleted: 0
+                    deleted: 0,
+                    authorityId: 1
                 };
 
                 let databaseConnection = await connectionPool.getConnection();
@@ -204,8 +208,10 @@ module.exports = function (express, connectionPool) {
                 let query = await databaseConnection.query(queryInsertStatement, user);
 
                 let querySelectStatement =
-                    "SELECT id, username, email, imagePath, " +
-                    "dateOfCreation, deleted FROM user " +
+                    "SELECT user.id AS 'id', username, email, imagePath, " +
+                    "dateOfCreation, deleted, authority.title AS 'authorityTitle' " +
+                    "FROM user " +
+                    "INNER JOIN authority ON user.authorityId = authority.id " +
                     "WHERE user.id = ?;";
 
                 let selectedUser = await databaseConnection.query(querySelectStatement, query.insertId);
@@ -282,8 +288,10 @@ module.exports = function (express, connectionPool) {
                 let query = await databaseConnection.query(queryUpdateStatement, [user, id]);
 
                 let querySelectStatement =
-                    "SELECT id, username, email, imagePath, " +
-                    "dateOfCreation, deleted FROM user " +
+                    "SELECT user.id AS 'id', username, email, imagePath, " +
+                    "dateOfCreation, deleted, authority.title AS 'authorityTitle' " +
+                    "FROM user " +
+                    "INNER JOIN authority ON user.authorityId = authority.id " +
                     "WHERE user.id = ?;";
 
                 let selectedUser = await databaseConnection.query(querySelectStatement, id);
