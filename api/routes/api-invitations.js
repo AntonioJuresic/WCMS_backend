@@ -37,8 +37,8 @@ function sendInvitationEmail(email, subject, message, code) {
         text: message + code
     };
 
-    transporter.sendMail(options, function(err, info) {
-        if(err) {
+    transporter.sendMail(options, function (err, info) {
+        if (err) {
             console.log(err);
         }
 
@@ -109,6 +109,8 @@ module.exports = function (express, connectionPool) {
     apiRouter.route("/:id")
         .get(async function (req, res) {
             try {
+                const id = req.params.id;
+
                 let databaseConnection = await connectionPool.getConnection();
 
                 let querySelectStatement =
@@ -116,14 +118,14 @@ module.exports = function (express, connectionPool) {
                     "FROM invitation " +
                     "WHERE invitation.id = ?;";
 
-                let selectedInvitation = await databaseConnection.query(querySelectStatement, req.params.id);
+                let selectedInvitation = await databaseConnection.query(querySelectStatement, id);
 
                 databaseConnection.release();
 
                 if (selectedInvitation.length == 0) {
                     return res.status(404).json({
                         status: 404,
-                        message: "No invitation found under the id : " + req.params.id
+                        message: "No invitation found under the id : " + id
                     });
                 }
 
@@ -135,10 +137,49 @@ module.exports = function (express, connectionPool) {
             }
         })
 
-        .delete(async function (req, res) {
-            const id = req.params.id;
-
+        .put(async function (req, res) {
             try {
+                const id = req.params.id;
+
+                const invitation = {
+                    code: req.body.code
+                };
+
+                if (req.body.email != undefined
+                    && req.body.subject != undefined
+                    && req.body.message != undefined) {
+                    sendInvitationEmail(req.body.email, req.body.subject, req.body.message, req.body.code);
+                }
+
+                let databaseConnection = await connectionPool.getConnection();
+
+                let queryUpdateStatement =
+                    "UPDATE invitation SET ? " +
+                    "WHERE invitation.id = ?;";
+
+                let query = await databaseConnection.query(queryUpdateStatement, [invitation, id]);
+
+                let querySelectStatement =
+                    "SELECT * " +
+                    "FROM invitation " +
+                    "WHERE invitation.id = ?;";
+
+                let selectedInvitation = await databaseConnection.query(querySelectStatement, query.insertId);
+
+                databaseConnection.release();
+
+                res.status(201).json({ selectedInvitation });
+
+            } catch (e) {
+                console.log(e);
+                return res.status(500).json({ error: "Server error" })
+            }
+        })
+
+        .delete(async function (req, res) {
+            try {
+                const id = req.params.id;
+
                 let databaseConnection = await connectionPool.getConnection();
 
                 let isPresent = await checkIfPresent(res, databaseConnection, id);

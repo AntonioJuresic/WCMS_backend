@@ -113,9 +113,7 @@ module.exports = function (express, connectionPool) {
 
     apiRouter.route("/:id")
         .get(async function (req, res) {
-
             try {
-
                 const token = req.body.token || req.params.token || req.headers["x-access-token"] || req.query.token;
 
                 let tokenId;

@@ -236,7 +236,7 @@ module.exports = function (express, connectionPool) {
 
                 let queryUpdateStatement =
                     "UPDATE comment SET ? " +
-                    "WHERE comment.id = ?";
+                    "WHERE comment.id = ?;";
 
                 let query = await databaseConnection.query(queryUpdateStatement, [comment, id]);
 

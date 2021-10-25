@@ -79,9 +79,52 @@ module.exports = function (express, connectionPool) {
 
                 let querySelectStatement =
                     "SELECT user.id AS 'id', username, email, imagePath, " +
-                    "dateOfCreation, deleted, authority.title AS 'authorityTitle' " +
+                    "dateOfCreation, deleted, authority.title AS 'authorityTitle', " +
+                    "authority.level AS 'authorityLevel' " +
                     "FROM user " +
                     "INNER JOIN authority ON user.authorityId = authority.id " +
+                    "WHERE user.id = ?;";
+
+                let selectedUser = await databaseConnection.query(querySelectStatement, id);
+
+                databaseConnection.release();
+
+                res.status(200).json({ selectedUser });
+
+            } catch (e) {
+                console.log(e);
+                return res.status(500).json({ error: "Server error" })
+            }
+        })
+
+        .delete(async function (req, res) {
+            try {
+                const id = req.params.id;
+
+                let databaseConnection = await connectionPool.getConnection();
+
+                let userExists = await checkIfUserExists(res, databaseConnection, id);
+                
+                if (!userExists) {
+                    return res.status(404).json({
+                        status: 404,
+                        message: "No user found under the id : " + id
+                    });
+                }
+
+                let queryUpdateStatement =
+                    "UPDATE user " +
+                    "SET user.authorityId = null " +
+                    "WHERE user.id = ?;";
+
+                let query = await databaseConnection.query(queryUpdateStatement, id);
+
+                let querySelectStatement =
+                    "SELECT user.id AS 'id', username, email, imagePath, " +
+                    "dateOfCreation, deleted, authority.title AS 'authorityTitle', " +
+                    "authority.level AS 'authorityLevel' " +
+                    "FROM user " +
+                    "LEFT JOIN authority ON user.authorityId = authority.id " +
                     "WHERE user.id = ?;";
 
                 let selectedUser = await databaseConnection.query(querySelectStatement, id);

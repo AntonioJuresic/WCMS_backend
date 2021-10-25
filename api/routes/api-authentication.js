@@ -15,7 +15,7 @@ module.exports = function (express, connectionPool) {
 
                 let queryUsernameStatement =
                     "SELECT username FROM user " +
-                    "WHERE username = ? " + 
+                    "WHERE username = ? " +
                     "AND deleted = false;";
 
                 let usernameData = await databaseConnection.query(queryUsernameStatement, req.body.username);
@@ -40,20 +40,25 @@ module.exports = function (express, connectionPool) {
 
                     if (compare) {
                         let queryUserStatement =
-                            "SELECT id, username, email, dateOfCreation, imagePath " +
+                            "SELECT user.id AS 'id', username, email, dateOfCreation, " +
+                            "imagePath, authority.title AS 'authorityTitle', " +
+                            "authority.level AS 'authorityLevel' " +
                             "FROM user " +
+                            "LEFT JOIN authority ON user.authorityId = authority.id " +
                             "WHERE username = ? ;";
 
                         let userData = await databaseConnection.query(queryUserStatement, req.body.username);
 
                         console.log(userData[0]);
-                        
+
                         const token = jwt.sign({
                             id: userData[0].id,
                             username: userData[0].username,
                             email: userData[0].email,
+                            dateOfCreation: userData[0].dateOfCreation,
                             imagePath: userData[0].imagePath,
-                            dateOfCreation: userData[0].dateOfCreation
+                            authorityTitle: userData[0].authorityTitle,
+                            authorityLevel: userData[0].authorityLevel
                         }, config.secret, {
                             //expiresIn: 3600
                         });
