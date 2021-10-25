@@ -1,4 +1,5 @@
 const tokenValidation = require("../token-validation");
+const authorityValidation = require("../authority-validation");
 
 async function checkIfUserExists(res, databaseConnection, id) {
     try {
@@ -39,7 +40,8 @@ async function checkIfAuthorityExists(res, databaseConnection, id) {
 module.exports = function (express, connectionPool) {
     let apiRouter = express.Router();
 
-    //apiRouter.use(tokenValidation());
+    apiRouter.use(tokenValidation());
+    apiRouter.use(authorityValidation());
     
     apiRouter.route("/:id")
         .put(async function (req, res) {

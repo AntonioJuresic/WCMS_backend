@@ -1,4 +1,6 @@
 const tokenValidation = require("../token-validation");
+const authorityValidation = require("../authority-validation");
+
 const config = require("../../config");
 
 const nodemailer = require("nodemailer");
@@ -49,7 +51,8 @@ function sendInvitationEmail(email, subject, message, code) {
 module.exports = function (express, connectionPool) {
     let apiRouter = express.Router();
 
-    //apiRouter.use(tokenValidation());
+    apiRouter.use(tokenValidation());
+    apiRouter.use(authorityValidation());
 
     apiRouter.route("/")
         .get(async function (req, res) {

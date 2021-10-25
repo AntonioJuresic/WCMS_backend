@@ -1,4 +1,6 @@
 const tokenValidation = require("../token-validation");
+const authorityValidation = require("../authority-validation");
+
 const config = require("../../config");
 const dateISOToMySQL = require("../../util/date-iso-to-mysql");
 
@@ -259,8 +261,11 @@ module.exports = function (express, connectionPool) {
                 console.log(e);
                 return res.status(500).json({ error: "Server error" })
             }
-        })
+        });
 
+    apiRouter.use(authorityValidation());
+
+    apiRouter.route("/:id")
         .delete(async function (req, res) {
             const id = req.params.id;
 

@@ -1,4 +1,5 @@
 const tokenValidation = require("../token-validation");
+const authorityValidation = require("../authority-validation");
 
 async function checkIfPresent(res, databaseConnection, id) {
     try {
@@ -58,8 +59,6 @@ async function checkIfTitleIsTaken(res, databaseConnection, title) {
 module.exports = function (express, connectionPool) {
     let apiRouter = express.Router();
 
-    //apiRouter.use(tokenValidation());
-
     apiRouter.route("/")
         .get(async function (req, res) {
             try {
@@ -72,40 +71,6 @@ module.exports = function (express, connectionPool) {
                 databaseConnection.release();
 
                 res.status(200).json({ selectedAuthorities })
-
-            } catch (e) {
-                console.log(e);
-                return res.status(500).json({ error: "Server error" })
-            }
-        })
-
-        .post(async function (req, res) {
-            try {
-                const authority = {
-                    level: req.body.level,
-                    title: req.body.title
-                };
-
-                let databaseConnection = await connectionPool.getConnection();
-
-                let titleIsTaken = await checkIfTitleIsTaken(res, databaseConnection, req.body.title);
-
-                if (titleIsTaken) {
-                    return res.status(409).json({ error: "Title taken" });
-                }
-
-                let queryInsertStatement = "INSERT INTO authority SET ?;";
-                let query = await databaseConnection.query(queryInsertStatement, authority);
-
-                let querySelectStatement =
-                    "SELECT * FROM authority " +
-                    "WHERE authority.id = ?;";
-
-                let selectedAuthority = await databaseConnection.query(querySelectStatement, query.insertId);
-
-                databaseConnection.release();
-
-                res.status(201).json({ selectedAuthority });
 
             } catch (e) {
                 console.log(e);
@@ -141,6 +106,45 @@ module.exports = function (express, connectionPool) {
             }
         })
 
+    apiRouter.use(tokenValidation());
+    apiRouter.use(authorityValidation());
+
+    apiRouter.route("/")
+        .post(async function (req, res) {
+            try {
+                const authority = {
+                    level: req.body.level,
+                    title: req.body.title
+                };
+
+                let databaseConnection = await connectionPool.getConnection();
+
+                let titleIsTaken = await checkIfTitleIsTaken(res, databaseConnection, req.body.title);
+
+                if (titleIsTaken) {
+                    return res.status(409).json({ error: "Title taken" });
+                }
+
+                let queryInsertStatement = "INSERT INTO authority SET ?;";
+                let query = await databaseConnection.query(queryInsertStatement, authority);
+
+                let querySelectStatement =
+                    "SELECT * FROM authority " +
+                    "WHERE authority.id = ?;";
+
+                let selectedAuthority = await databaseConnection.query(querySelectStatement, query.insertId);
+
+                databaseConnection.release();
+
+                res.status(201).json({ selectedAuthority });
+
+            } catch (e) {
+                console.log(e);
+                return res.status(500).json({ error: "Server error" })
+            }
+        });
+
+    apiRouter.route("/:id")
         .put(async function (req, res) {
             try {
                 const id = req.params.id;

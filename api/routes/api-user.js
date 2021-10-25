@@ -1,4 +1,6 @@
 const tokenValidation = require("../token-validation");
+const authorityValidation = require("../authority-validation");
+
 const config = require("../../config");
 const dateISOToMySQL = require("../../util/date-iso-to-mysql");
 
@@ -230,6 +232,7 @@ module.exports = function (express, connectionPool) {
         });
 
     apiRouter.use(tokenValidation());
+    apiRouter.use(authorityValidation());
 
     apiRouter.route("/:id")
         .put(multerUpload.single("image"), async function (req, res) {

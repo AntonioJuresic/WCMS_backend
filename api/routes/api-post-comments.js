@@ -19,7 +19,6 @@ async function checkIfPresent(res, databaseConnection, id) {
 module.exports = function (express, connectionPool) {
     let apiRouter = express.Router();
 
-
     apiRouter.route("/:id")
         .get(async function (req, res) {
 

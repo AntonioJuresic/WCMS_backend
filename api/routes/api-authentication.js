@@ -7,7 +7,6 @@ const crypto = require("crypto");
 module.exports = function (express, connectionPool) {
     let authenticationRouter = express.Router();
 
-
     authenticationRouter.route("/")
         .post(async function (req, res) {
             try {

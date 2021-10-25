@@ -1,4 +1,5 @@
 const tokenValidation = require("../token-validation");
+const authorityValidation = require("../authority-validation");
 
 async function checkIfPresent(res, databaseConnection) {
     try {
@@ -44,6 +45,7 @@ module.exports = function (express, connectionPool) {
         })
 
     apiRouter.use(tokenValidation());
+    apiRouter.use(authorityValidation());
 
     apiRouter.route("/")
         .post(async function (req, res) {
