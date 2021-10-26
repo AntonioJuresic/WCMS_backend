@@ -37,12 +37,29 @@ async function checkIfAuthorityExists(res, databaseConnection, id) {
     }
 }
 
+async function checkIfInvitationExists(res, databaseConnection, code) {
+    try {
+        let querySelectStatement =
+            "SELECT invitation.id " +
+            "FROM invitation " +
+            "WHERE invitation.code = ?;";
+
+        let selectedInvitationId = await databaseConnection.query(querySelectStatement, code);
+
+        return selectedInvitationId.length != 0
+    }
+
+    catch (e) {
+        console.log(e);
+        return res.status(500).json({ error: "Server error" })
+    }
+}
+
 module.exports = function (express, connectionPool) {
     let apiRouter = express.Router();
 
     apiRouter.use(tokenValidation());
-    apiRouter.use(authorityValidation());
-    
+
     apiRouter.route("/:id")
         .put(async function (req, res) {
             try {
@@ -52,10 +69,14 @@ module.exports = function (express, connectionPool) {
                     id: req.body.id
                 };
 
+                const invitation = {
+                    code: req.body.code
+                };
+
                 let databaseConnection = await connectionPool.getConnection();
 
                 let userExists = await checkIfUserExists(res, databaseConnection, id);
-                
+
                 if (!userExists) {
                     return res.status(404).json({
                         status: 404,
@@ -72,12 +93,27 @@ module.exports = function (express, connectionPool) {
                     });
                 }
 
+                let invitationExists = await checkIfInvitationExists(res, databaseConnection, invitation.code);
+
+                if (!invitationExists) {
+                    return res.status(403).json({
+                        status: 403,
+                        message: "Wrong invitation"
+                    });
+                }
+
+                let queryDeleteInvitationCode =
+                    "DELETE FROM invitation " +
+                    "WHERE invitation.code = ?;";
+
+                await databaseConnection.query(queryDeleteInvitationCode, invitation.code);
+
                 let queryUpdateStatement =
                     "UPDATE user " +
                     "SET user.authorityId = ? " +
                     "WHERE user.id = ?;";
 
-                let query = await databaseConnection.query(queryUpdateStatement, [authority.id, id]);
+                await databaseConnection.query(queryUpdateStatement, [authority.id, id]);
 
                 let querySelectStatement =
                     "SELECT user.id AS 'id', username, email, imagePath, " +
@@ -97,8 +133,11 @@ module.exports = function (express, connectionPool) {
                 console.log(e);
                 return res.status(500).json({ error: "Server error" })
             }
-        })
+        });
 
+    apiRouter.use(authorityValidation());
+
+    apiRouter.route("/:id")
         .delete(async function (req, res) {
             try {
                 const id = req.params.id;
@@ -106,7 +145,7 @@ module.exports = function (express, connectionPool) {
                 let databaseConnection = await connectionPool.getConnection();
 
                 let userExists = await checkIfUserExists(res, databaseConnection, id);
-                
+
                 if (!userExists) {
                     return res.status(404).json({
                         status: 404,
