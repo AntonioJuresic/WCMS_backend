@@ -42,7 +42,8 @@ module.exports = function (express, connectionPool) {
                     "FROM COMMENT " +
                     "INNER JOIN USER ON comment.userId = user.id " +
                     "INNER JOIN post ON comment.postId = post.id " +
-                    "WHERE user.username = ? " +
+                    "WHERE user.deleted = 0 " +
+                    "AND user.username = ? " +
                     "ORDER BY comment.dateOfCreation DESC;";
 
                 let selectedComments = await databaseConnection.query(querySelectStatement, req.params.username);

@@ -36,16 +36,21 @@ module.exports = function (express, connectionPool) {
                 }
 
                 let querySelectUserStatement =
-                    "SELECT id, username, email, imagePath, " +
-                    "dateOfCreation, deleted FROM user " +
-                    "WHERE user.username = ?;";
+                    "SELECT user.id AS 'id', username, email, imagePath, " +
+                    "dateOfCreation, authority.title AS 'authorityTitle', " +
+                    "authority.level AS 'authorityLevel' " +
+                    "FROM user " +
+                    "LEFT JOIN authority ON user.authorityId = authority.id " +
+                    "WHERE user.deleted = 0 " +
+                    "AND user.username = ?;";
 
                 let selectedUser = await databaseConnection.query(querySelectUserStatement, req.params.username);
 
                 let querySelectStatement =
                     "SELECT post.* FROM user " +
                     "INNER JOIN post ON user.id = post.userId " +
-                    "WHERE user.username = ? " + 
+                    "WHERE user.deleted = 0 " +
+                    "AND user.username = ? " + 
                     "ORDER BY post.dateOfCreation DESC;";
 
                 let selectedPosts = await databaseConnection.query(querySelectStatement, req.params.username);
