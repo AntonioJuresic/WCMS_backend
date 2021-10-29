@@ -17,7 +17,7 @@ const userAuthorityRouter = require("./routes/api-user-authority");
 
 const commentRouter = require("./routes/api-comments");
 
-//const userHimselfRouter = require("./routes/api-user-himself");
+const userHimselfRouter = require("./routes/api-user-himself");
 
 module.exports = (express, connectionPool) => {
     const apiRouter = express.Router();
@@ -43,7 +43,7 @@ module.exports = (express, connectionPool) => {
     apiRouter.use("/user-posts", userPostsRouter(express, connectionPool));
     apiRouter.use("/user-comments", userCommentRouter(express, connectionPool));
     apiRouter.use("/user-authority", userAuthorityRouter(express, connectionPool));
-    //apiRouter.use("/user-himself", userHimselfRouter(express, connectionPool));
+    apiRouter.use("/user-himself", userHimselfRouter(express, connectionPool));
 
     apiRouter.use("/comment", commentRouter(express, connectionPool));
     

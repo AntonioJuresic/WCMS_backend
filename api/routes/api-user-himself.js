@@ -143,8 +143,11 @@ module.exports = function (express, connectionPool) {
                 }
 
                 let querySelectStatement =
-                    "SELECT id, username, email, " +
-                    "dateOfCreation, deleted FROM user " +
+                    "SELECT user.id AS 'id', username, email, imagePath, " +
+                    "dateOfCreation, deleted, authority.title AS 'authorityTitle', " +
+                    "authority.level AS 'authorityLevel' " +
+                    "FROM user " +
+                    "LEFT JOIN authority ON user.authorityId = authority.id " +
                     "WHERE user.id = ?;";
 
                 let selectedUser = await databaseConnection.query(querySelectStatement, paramsId);
@@ -177,9 +180,6 @@ module.exports = function (express, connectionPool) {
                         message: "Params id doesn't match with the token id"
                     });
                 }
-
-                let imagePath = req.file.destination + req.file.filename;
-                imagePath = imagePath.replace("\\", "/");
 
                 if (req.file) {
                     let imagePath = req.file.destination + req.file.filename;
@@ -236,8 +236,11 @@ module.exports = function (express, connectionPool) {
                 let query = await databaseConnection.query(queryUpdateStatement, [user, paramsId]);
 
                 let querySelectStatement =
-                    "SELECT id, username, email, imagePath, " +
-                    "dateOfCreation, deleted FROM user " +
+                    "SELECT user.id AS 'id', username, email, imagePath, " +
+                    "dateOfCreation, deleted, authority.title AS 'authorityTitle', " +
+                    "authority.level AS 'authorityLevel' " +
+                    "FROM user " +
+                    "LEFT JOIN authority ON user.authorityId = authority.id " +
                     "WHERE user.id = ?;";
 
                 let selectedUser = await databaseConnection.query(querySelectStatement, paramsId);
