@@ -81,10 +81,10 @@ module.exports = function (express, connectionPool) {
                     code: req.body.code
                 };
 
-                if (req.body.email != undefined
-                    && req.body.subject != undefined
-                    && req.body.message != undefined) {
+                if (req.body.email != undefined || req.body.subject != undefined || req.body.message != undefined) {
                     sendInvitationEmail(req.body.email, req.body.subject, req.body.message, req.body.code);
+                } else {
+                    return res.status(409).json({ status: 409 });
                 }
 
                 let databaseConnection = await connectionPool.getConnection();
@@ -148,10 +148,10 @@ module.exports = function (express, connectionPool) {
                     code: req.body.code
                 };
 
-                if (req.body.email != undefined
-                    && req.body.subject != undefined
-                    && req.body.message != undefined) {
+                if (req.body.email != undefined || req.body.subject != undefined || req.body.message != undefined) {
                     sendInvitationEmail(req.body.email, req.body.subject, req.body.message, req.body.code);
+                } else {
+                    return res.status(409).json({ status: 409 });
                 }
 
                 let databaseConnection = await connectionPool.getConnection();
@@ -167,7 +167,7 @@ module.exports = function (express, connectionPool) {
                     "FROM invitation " +
                     "WHERE invitation.id = ?;";
 
-                let selectedInvitation = await databaseConnection.query(querySelectStatement, query.insertId);
+                let selectedInvitation = await databaseConnection.query(querySelectStatement, id);
 
                 databaseConnection.release();
 
