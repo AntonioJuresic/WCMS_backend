@@ -23,7 +23,7 @@ async function checkIfPresent(res, databaseConnection, id) {
     }
 }
 
-function sendInvitationEmail(email, subject, message, code) {
+function sendInvitationEmail(emailAddress, emailSubject, emailMessage, code) {
     const transporter = nodemailer.createTransport({
         service: "hotmail",
         auth: {
@@ -33,10 +33,10 @@ function sendInvitationEmail(email, subject, message, code) {
     });
 
     const options = {
-        from: "ajuresic@tvz.hr",
-        to: email,
-        subject: subject,
-        text: message + code
+        from: config.auth.user,
+        to: emailAddress,
+        subject: emailSubject,
+        text: emailMessage
     };
 
     transporter.sendMail(options, function (err, info) {
@@ -78,11 +78,16 @@ module.exports = function (express, connectionPool) {
         .post(async function (req, res) {
             try {
                 const invitation = {
-                    code: req.body.code
+                    code: req.body.code,
+                    emailAddress: req.body.emailAddress,
+                    emailSubject: req.body.emailSubject,
+                    emailMessage: req.body.emailMessage
                 };
 
-                if (req.body.email != undefined || req.body.subject != undefined || req.body.message != undefined) {
-                    sendInvitationEmail(req.body.email, req.body.subject, req.body.message, req.body.code);
+                if (req.body.emailAddress != undefined || req.body.emailSubject != undefined
+                    || req.body.emailMessage != undefined) {
+                    sendInvitationEmail(req.body.emailAddress, req.body.emailSubject,
+                        req.body.emailMessage, req.body.code);
                 } else {
                     return res.status(409).json({ status: 409 });
                 }
@@ -145,11 +150,16 @@ module.exports = function (express, connectionPool) {
                 const id = req.params.id;
 
                 const invitation = {
-                    code: req.body.code
+                    code: req.body.code,
+                    emailAddress: req.body.emailAddress,
+                    emailSubject: req.body.emailSubject,
+                    emailMessage: req.body.emailMessage
                 };
 
-                if (req.body.email != undefined || req.body.subject != undefined || req.body.message != undefined) {
-                    sendInvitationEmail(req.body.email, req.body.subject, req.body.message, req.body.code);
+                if (req.body.emailAddress != undefined || req.body.emailSubject != undefined
+                    || req.body.emailMessage != undefined) {
+                    sendInvitationEmail(req.body.emailAddress, req.body.emailSubject,
+                        req.body.emailMessage, req.body.code);
                 } else {
                     return res.status(409).json({ status: 409 });
                 }
