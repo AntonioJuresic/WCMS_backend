@@ -65,12 +65,8 @@ module.exports = function (express, connectionPool) {
             try {
                 const id = req.params.id;
 
-                const authority = {
-                    id: req.body.authorityId
-                };
-
                 const invitation = {
-                    code: req.body.invitationCode
+                    code: req.body.code
                 };
 
                 let databaseConnection = await connectionPool.getConnection();
@@ -84,15 +80,6 @@ module.exports = function (express, connectionPool) {
                     });
                 }
 
-                let authorityExists = await checkIfAuthorityExists(res, databaseConnection, authority.id);
-
-                if (!authorityExists) {
-                    return res.status(404).json({
-                        status: 404,
-                        message: "No authority found under the id : " + authority.id
-                    });
-                }
-
                 let invitationExists = await checkIfInvitationExists(res, databaseConnection, invitation.code);
 
                 if (!invitationExists) {
@@ -101,6 +88,13 @@ module.exports = function (express, connectionPool) {
                         message: "Wrong invitation"
                     });
                 }
+
+                let querySelectAuthorityIdStatement =
+                    "SELECT invitation.authorityId " +
+                    "FROM invitation " +
+                    "WHERE invitation.code = ?;";
+
+                let selectedAuthorityId = await databaseConnection.query(querySelectAuthorityIdStatement, invitation.code);
 
                 let queryDeleteInvitationCode =
                     "DELETE FROM invitation " +
@@ -113,7 +107,7 @@ module.exports = function (express, connectionPool) {
                     "SET user.authorityId = ? " +
                     "WHERE user.id = ?;";
 
-                await databaseConnection.query(queryUpdateStatement, [authority.id, id]);
+                await databaseConnection.query(queryUpdateStatement, [selectedAuthorityId[0].authorityId, id]);
 
                 let querySelectStatement =
                     "SELECT user.id AS 'id', username, email, imagePath, " +
