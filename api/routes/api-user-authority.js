@@ -66,11 +66,11 @@ module.exports = function (express, connectionPool) {
                 const id = req.params.id;
 
                 const authority = {
-                    id: req.body.id
+                    id: req.body.authorityId
                 };
 
                 const invitation = {
-                    code: req.body.code
+                    code: req.body.invitationCode
                 };
 
                 let databaseConnection = await connectionPool.getConnection();

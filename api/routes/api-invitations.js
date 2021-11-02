@@ -81,7 +81,8 @@ module.exports = function (express, connectionPool) {
                     code: req.body.code,
                     emailAddress: req.body.emailAddress,
                     emailSubject: req.body.emailSubject,
-                    emailMessage: req.body.emailMessage
+                    emailMessage: req.body.emailMessage,
+                    authorityId: req.body.authorityId
                 };
 
                 if (req.body.emailAddress != undefined || req.body.emailSubject != undefined
@@ -153,7 +154,8 @@ module.exports = function (express, connectionPool) {
                     code: req.body.code,
                     emailAddress: req.body.emailAddress,
                     emailSubject: req.body.emailSubject,
-                    emailMessage: req.body.emailMessage
+                    emailMessage: req.body.emailMessage,
+                    authorityId: req.body.authorityId
                 };
 
                 if (req.body.emailAddress != undefined || req.body.emailSubject != undefined
