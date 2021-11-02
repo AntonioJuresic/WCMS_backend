@@ -23,6 +23,24 @@ async function checkIfPresent(res, databaseConnection, id) {
     }
 }
 
+async function checkIfAuthorityExists(res, databaseConnection, id) {
+    try {
+        let querySelectStatement =
+            "SELECT authority.id " +
+            "FROM authority " +
+            "WHERE authority.id = ?;";
+
+        let selectedAuthorityId = await databaseConnection.query(querySelectStatement, id);
+
+        return selectedAuthorityId.length != 0
+    }
+
+    catch (e) {
+        console.log(e);
+        return res.status(500).json({ error: "Server error" })
+    }
+}
+
 function sendInvitationEmail(emailAddress, emailSubject, emailMessage, code) {
     const transporter = nodemailer.createTransport({
         service: "hotmail",
@@ -85,6 +103,17 @@ module.exports = function (express, connectionPool) {
                     authorityId: req.body.authorityId
                 };
 
+                let databaseConnection = await connectionPool.getConnection();
+
+                let authorityExists = await checkIfAuthorityExists(res, databaseConnection, invitation.authorityId);
+
+                if (!authorityExists) {
+                    return res.status(404).json({
+                        status: 404,
+                        message: "No authority found under the id : " + invitation.authorityId
+                    });
+                }
+
                 if (req.body.emailAddress != undefined || req.body.emailSubject != undefined
                     || req.body.emailMessage != undefined) {
                     sendInvitationEmail(req.body.emailAddress, req.body.emailSubject,
@@ -92,8 +121,6 @@ module.exports = function (express, connectionPool) {
                 } else {
                     return res.status(409).json({ status: 409 });
                 }
-
-                let databaseConnection = await connectionPool.getConnection();
 
                 let queryInsertStatement = "INSERT INTO invitation SET ?";
                 let query = await databaseConnection.query(queryInsertStatement, invitation);
@@ -158,6 +185,17 @@ module.exports = function (express, connectionPool) {
                     authorityId: req.body.authorityId
                 };
 
+                let databaseConnection = await connectionPool.getConnection();
+
+                let authorityExists = await checkIfAuthorityExists(res, databaseConnection, invitation.authorityId);
+
+                if (!authorityExists) {
+                    return res.status(404).json({
+                        status: 404,
+                        message: "No authority found under the id : " + authority.id
+                    });
+                }
+
                 if (req.body.emailAddress != undefined || req.body.emailSubject != undefined
                     || req.body.emailMessage != undefined) {
                     sendInvitationEmail(req.body.emailAddress, req.body.emailSubject,
@@ -165,8 +203,6 @@ module.exports = function (express, connectionPool) {
                 } else {
                     return res.status(409).json({ status: 409 });
                 }
-
-                let databaseConnection = await connectionPool.getConnection();
 
                 let queryUpdateStatement =
                     "UPDATE invitation SET ? " +
