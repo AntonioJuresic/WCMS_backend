@@ -33,7 +33,17 @@ module.exports = function (express, connectionPool) {
                     "WHERE website.id = 1;"
 
                 let selectedWebsiteInfo = await databaseConnection.query(queryUpdateStatement);
+                
                 databaseConnection.release();
+
+                console.log(selectedWebsiteInfo);
+                
+                if (selectedWebsiteInfo.length == 0) {
+                    return res.status(404).json({
+                        status: 404,
+                        message: "Website info not set"
+                    });
+                }
 
                 res.status(200).json({ selectedWebsiteInfo })
 

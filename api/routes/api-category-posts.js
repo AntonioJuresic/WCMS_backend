@@ -41,9 +41,17 @@ module.exports = function (express, connectionPool) {
 
 
                 let querySelectPostsStatement =
-                    "SELECT post.* FROM category " +
-                    "INNER JOIN post ON category.id = post.categoryId " +
-                    "WHERE category.name = ? " +
+                    "SELECT post.id, post.title, " +
+                    "post.imagePath, post.content, " +
+                    "post.dateOfCreation, " +
+                    "post.userId, post.categoryId, " +
+                    "user.username AS userUsername, " +
+                    "category.name AS categoryName " +
+                    "FROM post " +
+                    "INNER JOIN USER ON post.userId = user.id " +
+                    "INNER JOIN category ON post.categoryId = category.id " +
+                    "WHERE user.deleted = 0 " +
+                    "AND category.name = ? " +
                     "ORDER BY post.dateOfCreation DESC;";
 
                 let selectedPosts = await databaseConnection.query(querySelectPostsStatement, req.params.name);
