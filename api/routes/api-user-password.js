@@ -163,13 +163,10 @@ module.exports = function (express, connectionPool) {
                 let ifValid = await checkIfValid(res, databaseConnection, code);
 
                 if (!ifValid) {
-                    console.log("Kod ne valja")
                     return res.status(403).json({
                         status: 403,
                         message: "Code not valid"
                     });
-                } else {
-                    console.log("Kod valja")
                 }
 
                 let userId = await getUserId(res, databaseConnection, email);
