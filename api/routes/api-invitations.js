@@ -42,28 +42,35 @@ async function checkIfAuthorityExists(res, databaseConnection, id) {
 }
 
 function sendInvitationEmail(emailAddress, emailSubject, emailMessage, code) {
-    const transporter = nodemailer.createTransport({
-        service: "hotmail",
-        auth: {
-            user: config.auth.user,
-            pass: config.auth.pass
-        }
-    });
+    try {
+        const transporter = nodemailer.createTransport({
+            service: "hotmail",
+            auth: {
+                user: config.auth.user,
+                pass: config.auth.pass
+            }
+        });
 
-    const options = {
-        from: config.auth.user,
-        to: emailAddress,
-        subject: emailSubject,
-        text: emailMessage
-    };
+        const options = {
+            from: config.auth.user,
+            to: emailAddress,
+            subject: emailSubject,
+            text: emailMessage + code
+        };
 
-    transporter.sendMail(options, function (err, info) {
-        if (err) {
-            console.log(err);
-        }
+        transporter.sendMail(options, function (err, info) {
+            if (err) {
+                console.log(err);
+            }
 
-        console.log(info.response);
-    });
+            console.log(info.response);
+        });
+    }
+
+    catch (e) {
+        console.log(e);
+        return res.status(500).json({ error: "Server error" })
+    }
 }
 
 module.exports = function (express, connectionPool) {
