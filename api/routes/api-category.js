@@ -67,13 +67,6 @@ module.exports = function (express, connectionPool) {
 
                 databaseConnection.release();
 
-                if (selectedCategories.length == 0) {
-                    return res.status(404).json({
-                        status: 404,
-                        message: "No categories found"
-                    });
-                }
-
                 res.status(200).json({ selectedCategories })
 
             } catch (e) {
