@@ -62,6 +62,8 @@ module.exports = function (express, connectionPool) {
                             //expiresIn: 3600
                         });
 
+                        databaseConnection.release();
+
                         return res.status(200).json({ status: 200, token: token, userData: userData[0] });
                     } else {
                         return res.status(403).json({ status: 403, message: "Wrong password" });
