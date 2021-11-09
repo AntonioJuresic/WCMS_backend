@@ -55,8 +55,6 @@ module.exports = function (express, connectionPool) {
 
                 databaseConnection.release();
 
-                console.log(selectedMeta);
-
                 if (selectedMeta.length == 0) {
                     return res.status(404).json({
                         status: 404,
@@ -165,8 +163,6 @@ module.exports = function (express, connectionPool) {
                 }
 
                 let databaseConnection = await connectionPool.getConnection();
-
-                console.log(meta);
 
                 let queryUpdateStatement =
                     "UPDATE meta SET ? " +
