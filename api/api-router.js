@@ -7,7 +7,7 @@ const userPasswordRouter = require("./routes/api-user-password");
 const userHimselfRouter = require("./routes/api-user-himself");
 const userAuthorityRouter = require("./routes/api-user-authority");
 
-const headerRouter = require("./routes/api-head");
+const websiteMetaRouter = require("./routes/api-website-meta");
 
 const categoryRouter = require("./routes/api-category");
 
@@ -36,7 +36,7 @@ module.exports = (express, connectionPool) => {
     apiRouter.use("/user-himself", userHimselfRouter(express, connectionPool));
     apiRouter.use("/user-authority", userAuthorityRouter(express, connectionPool));
     
-    apiRouter.use("/head", headerRouter(express, connectionPool));
+    apiRouter.use("/meta", websiteMetaRouter(express, connectionPool));
 
     apiRouter.use("/category", categoryRouter(express, connectionPool));
     

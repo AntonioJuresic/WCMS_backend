@@ -22,9 +22,9 @@ const multerUpload = multer({
 async function checkIfPresent(res, databaseConnection) {
     try {
         let querySelectIdStatement =
-            "SELECT head.id " +
-            "FROM head " +
-            "WHERE head.id = 1;";
+            "SELECT meta.id " +
+            "FROM meta " +
+            "WHERE meta.id = 1;";
 
         let selectedWebsiteId = await databaseConnection.query(querySelectIdStatement);
 
@@ -48,23 +48,23 @@ module.exports = function (express, connectionPool) {
                 let querySelectStatement =
                     "SELECT title, imagePath, charset, " +
                     "keywords, description, author, viewport " +
-                    "FROM head " +
-                    "WHERE head.id = 1;"
+                    "FROM meta " +
+                    "WHERE meta.id = 1;"
 
-                let selectedHead = await databaseConnection.query(querySelectStatement);
+                let selectedMeta = await databaseConnection.query(querySelectStatement);
 
                 databaseConnection.release();
 
-                console.log(selectedHead);
+                console.log(selectedMeta);
 
-                if (selectedHead.length == 0) {
+                if (selectedMeta.length == 0) {
                     return res.status(404).json({
                         status: 404,
                         message: "Website info not set"
                     });
                 }
 
-                res.status(200).json({ selectedHead })
+                res.status(200).json({ selectedMeta })
 
             } catch (e) {
                 console.log(e);
@@ -89,7 +89,7 @@ module.exports = function (express, connectionPool) {
                 let imagePath = req.file.destination + req.file.filename;
                 imagePath = imagePath.replace("\\", "/");
 
-                const head = {
+                const meta = {
                     title: req.body.title,
                     imagePath: imagePath,
                     charset: req.body.charset,
@@ -107,26 +107,26 @@ module.exports = function (express, connectionPool) {
                 if (isPresent) {
                     return res.status(409).json({
                         status: 409,
-                        message: "Head info is already in the database. " +
+                        message: "Meta info is already in the database. " +
                             "You can change it by sending a post request."
                     });
                 }
 
                 let queryInsertStatement =
-                    "INSERT INTO head SET ?;";
+                    "INSERT INTO meta SET ?;";
 
-                await databaseConnection.query(queryInsertStatement, head);
+                await databaseConnection.query(queryInsertStatement, meta);
 
                 let querySelectStatement =
                     "SELECT title, imagePath, charset, " +
                     "keywords, description, author, viewport " +
-                    "FROM head " +
-                    "WHERE head.id = 1;"
+                    "FROM meta " +
+                    "WHERE meta.id = 1;"
 
-                let selectedHead = await databaseConnection.query(querySelectStatement);
+                let selectedMeta = await databaseConnection.query(querySelectStatement);
                 databaseConnection.release();
 
-                res.status(201).json({ selectedHead });
+                res.status(201).json({ selectedMeta });
 
             } catch (e) {
                 console.log(e);
@@ -141,7 +141,7 @@ module.exports = function (express, connectionPool) {
                     let imagePath = req.file.destination + req.file.filename;
                     imagePath = imagePath.replace("\\", "/");
 
-                    head = {
+                    meta = {
                         title: req.body.title,
                         imagePath: imagePath,
                         charset: req.body.charset,
@@ -153,7 +153,7 @@ module.exports = function (express, connectionPool) {
                     };
 
                 } else if (!req.file) {
-                    head = {
+                    meta = {
                         title: req.body.title,
                         charset: req.body.charset,
                         keywords: req.body.keywords,
@@ -166,24 +166,24 @@ module.exports = function (express, connectionPool) {
 
                 let databaseConnection = await connectionPool.getConnection();
 
-                console.log(head);
+                console.log(meta);
 
                 let queryUpdateStatement =
-                    "UPDATE head SET ? " +
-                    "WHERE head.id = 1";
+                    "UPDATE meta SET ? " +
+                    "WHERE meta.id = 1";
 
-                await databaseConnection.query(queryUpdateStatement, head);
+                await databaseConnection.query(queryUpdateStatement, meta);
 
                 let querySelectStatement =
                     "SELECT title, imagePath, charset, " +
                     "keywords, description, author, viewport " +
-                    "FROM head " +
-                    "WHERE head.id = 1;"
+                    "FROM meta " +
+                    "WHERE meta.id = 1;"
 
-                let selectedHead = await databaseConnection.query(querySelectStatement);
+                let selectedMeta = await databaseConnection.query(querySelectStatement);
                 databaseConnection.release();
 
-                res.status(200).json({ selectedHead });
+                res.status(200).json({ selectedMeta });
 
             } catch (e) {
                 console.log(e);
