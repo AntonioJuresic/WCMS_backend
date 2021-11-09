@@ -13,16 +13,22 @@ async function initializeDatabase() {
 
         var fs = require('fs');
 
-        var sqlScript = fs.readFileSync(__dirname + "/SQL/schema.sql", 'utf8');
-        console.log(sqlScript);
+        var DDL = fs.readFileSync(__dirname + "/SQL/DDL.sql", 'utf8');
 
         await con.connect(function (err) {
             if (err) throw err;
+        });
 
-            con.query(sqlScript, function (err, result) {
-                if (err) throw err;
-                console.log("Table created");
-            });
+        await con.query(DDL, function (err, result) {
+            if (err) throw err;
+            console.log("Database and tables created");
+        });
+
+        var DML = fs.readFileSync(__dirname + "/SQL/DML.sql", 'utf8');
+
+        await con.query(DML, function (err, result) {
+            if (err) throw err;
+            console.log("Data inserted into database");
         });
 
     } catch (err) {
