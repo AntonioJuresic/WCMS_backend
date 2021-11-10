@@ -9,6 +9,7 @@ const userAuthorityRouter = require("./routes/api-user-authority");
 
 const websiteMetaRouter = require("./routes/api-website-meta");
 const websiteHeaderRouter = require("./routes/api-website-header");
+const websiteFooterRouter = require("./routes/api-website-footer");
 
 const categoryRouter = require("./routes/api-category");
 
@@ -38,8 +39,9 @@ module.exports = (express, connectionPool) => {
     apiRouter.use("/user-authority", userAuthorityRouter(express, connectionPool));
 
     apiRouter.use("/website-meta", websiteMetaRouter(express, connectionPool));
-
     apiRouter.use("/website-header", websiteHeaderRouter(express, connectionPool));
+    apiRouter.use("/website-footer", websiteFooterRouter(express, connectionPool));
+
 
     apiRouter.use("/category", categoryRouter(express, connectionPool));
 
