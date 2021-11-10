@@ -32,11 +32,11 @@ module.exports = function (express, connectionPool) {
                     "FROM header " +
                     "WHERE header.id = 1;"
 
-                let selectedHeader = await databaseConnection.query(querySelectStatement);
+                let selectedWebsiteHeader = await databaseConnection.query(querySelectStatement);
 
                 databaseConnection.release();
 
-                res.status(200).json({ selectedHeader })
+                res.status(200).json({ selectedWebsiteHeader })
 
             } catch (e) {
                 console.log(e);
@@ -78,11 +78,11 @@ module.exports = function (express, connectionPool) {
                     "FROM header " +
                     "WHERE header.id = 1;"
 
-                let selectedHeader = await databaseConnection.query(querySelectStatement);
+                let selectedWebsiteHeader = await databaseConnection.query(querySelectStatement);
 
                 databaseConnection.release();
 
-                res.status(201).json({ selectedHeader });
+                res.status(201).json({ selectedWebsiteHeader });
 
             } catch (e) {
                 console.log(e);
@@ -111,11 +111,11 @@ module.exports = function (express, connectionPool) {
                     "FROM header " +
                     "WHERE header.id = 1;"
 
-                let selectedHeader = await databaseConnection.query(querySelectStatement);
+                let selectedWebsiteHeader = await databaseConnection.query(querySelectStatement);
 
                 databaseConnection.release();
 
-                res.status(200).json({ selectedHeader });
+                res.status(200).json({ selectedWebsiteHeader });
 
             } catch (e) {
                 console.log(e);

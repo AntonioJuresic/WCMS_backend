@@ -32,11 +32,11 @@ module.exports = function (express, connectionPool) {
                     "FROM footer " +
                     "WHERE footer.id = 1;"
 
-                let selectedFooter = await databaseConnection.query(querySelectStatement);
+                let selectedWebsiteFooter = await databaseConnection.query(querySelectStatement);
 
                 databaseConnection.release();
 
-                res.status(200).json({ selectedFooter })
+                res.status(200).json({ selectedWebsiteFooter })
 
             } catch (e) {
                 console.log(e);
@@ -78,11 +78,11 @@ module.exports = function (express, connectionPool) {
                     "FROM footer " +
                     "WHERE footer.id = 1;"
 
-                let selectedFooter = await databaseConnection.query(querySelectStatement);
+                let selectedWebsiteFooter = await databaseConnection.query(querySelectStatement);
 
                 databaseConnection.release();
 
-                res.status(201).json({ selectedFooter });
+                res.status(201).json({ selectedWebsiteFooter });
 
             } catch (e) {
                 console.log(e);
@@ -111,11 +111,11 @@ module.exports = function (express, connectionPool) {
                     "FROM footer " +
                     "WHERE footer.id = 1;"
 
-                let selectedFooter = await databaseConnection.query(querySelectStatement);
+                let selectedWebsiteFooter = await databaseConnection.query(querySelectStatement);
 
                 databaseConnection.release();
 
-                res.status(200).json({ selectedFooter });
+                res.status(200).json({ selectedWebsiteFooter });
 
             } catch (e) {
                 console.log(e);
