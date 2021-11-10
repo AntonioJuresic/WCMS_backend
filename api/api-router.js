@@ -8,6 +8,7 @@ const userHimselfRouter = require("./routes/api-user-himself");
 const userAuthorityRouter = require("./routes/api-user-authority");
 
 const websiteMetaRouter = require("./routes/api-website-meta");
+const websiteHeaderRouter = require("./routes/api-website-header");
 
 const categoryRouter = require("./routes/api-category");
 
@@ -35,18 +36,20 @@ module.exports = (express, connectionPool) => {
     apiRouter.use("/user-password", userPasswordRouter(express, connectionPool));
     apiRouter.use("/user-himself", userHimselfRouter(express, connectionPool));
     apiRouter.use("/user-authority", userAuthorityRouter(express, connectionPool));
-    
-    apiRouter.use("/meta", websiteMetaRouter(express, connectionPool));
+
+    apiRouter.use("/website-meta", websiteMetaRouter(express, connectionPool));
+
+    apiRouter.use("/website-header", websiteHeaderRouter(express, connectionPool));
 
     apiRouter.use("/category", categoryRouter(express, connectionPool));
-    
+
     apiRouter.use("/post", postRouter(express, connectionPool));
     apiRouter.use("/category-posts", categoryPostsRouter(express, connectionPool));
     apiRouter.use("/user-posts", userPostsRouter(express, connectionPool));
-    
+
     apiRouter.use("/comment", commentRouter(express, connectionPool));
     apiRouter.use("/post-comments", postCommentsRouter(express, connectionPool));
     apiRouter.use("/user-comments", userCommentRouter(express, connectionPool));
-    
+
     return apiRouter;
 };

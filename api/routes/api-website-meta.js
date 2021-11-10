@@ -106,7 +106,7 @@ module.exports = function (express, connectionPool) {
                     return res.status(409).json({
                         status: 409,
                         message: "Meta info is already in the database. " +
-                            "You can change it by sending a post request."
+                            "You can change it by sending a put request."
                     });
                 }
 
