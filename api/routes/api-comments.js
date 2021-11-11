@@ -263,13 +263,31 @@ module.exports = function (express, connectionPool) {
             }
         });
 
-    apiRouter.use(authorityValidation());
+    //apiRouter.use(authorityValidation());
 
     apiRouter.route("/:id")
         .delete(async function (req, res) {
-            const id = req.params.id;
-
             try {
+                const token = req.body.token || req.params.token || req.headers["x-access-token"] || req.query.token;
+
+                let tokenId;
+
+                jwt.verify(token, config.secret, function (err, decoded) {
+                    tokenId = decoded.id;
+                });
+
+                const userId = req.body.userId;
+                const authorityLevel = req.body.userId;
+
+                if (tokenId != userId && authorityLevel == 0) {
+                    return res.status(403).json({
+                        status: 403,
+                        message: "You don't have the rights to delete this comment"
+                    });
+                }
+
+                const id = req.params.id;
+
                 let databaseConnection = await connectionPool.getConnection();
 
                 let isPresent = await checkIfPresent(res, databaseConnection, id);
