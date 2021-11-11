@@ -127,6 +127,13 @@ module.exports = function (express, connectionPool) {
                 res.status(201).json({ selectedMeta });
 
             } catch (e) {
+                if (req.file) {
+                    let imagePath = req.file.destination + req.file.filename;
+                    imagePath = imagePath.replace("\\", "/");
+
+                    await deleteFile(imagePath);
+                }
+
                 console.log(e);
                 return res.status(500).json({ error: "Server error" })
             }
@@ -135,6 +142,8 @@ module.exports = function (express, connectionPool) {
     apiRouter.route("/")
         .put(multerUpload.single("image"), async function (req, res) {
             try {
+                let databaseConnection = await connectionPool.getConnection();
+
                 if (req.file) {
                     let imagePath = req.file.destination + req.file.filename;
                     imagePath = imagePath.replace("\\", "/");
@@ -150,6 +159,16 @@ module.exports = function (express, connectionPool) {
                         id: 1
                     };
 
+                    let querySelectImagePathStatement =
+                        "SELECT meta.imagePath " +
+                        "FROM meta " +
+                        "WHERE meta.id = ?;";
+
+                    let selectedImagePath = await databaseConnection.query(querySelectImagePathStatement, id);
+
+                    await deleteFile(selectedImagePath[0].imagePath);
+
+
                 } else if (!req.file) {
                     meta = {
                         title: req.body.title,
@@ -161,8 +180,6 @@ module.exports = function (express, connectionPool) {
                         id: 1
                     };
                 }
-
-                let databaseConnection = await connectionPool.getConnection();
 
                 let queryUpdateStatement =
                     "UPDATE meta SET ? " +
@@ -182,6 +199,13 @@ module.exports = function (express, connectionPool) {
                 res.status(200).json({ selectedMeta });
 
             } catch (e) {
+                if (req.file) {
+                    let imagePath = req.file.destination + req.file.filename;
+                    imagePath = imagePath.replace("\\", "/");
+
+                    await deleteFile(imagePath);
+                }
+
                 console.log(e);
                 return res.status(500).json({ error: "Server error" })
             }

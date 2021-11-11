@@ -106,6 +106,22 @@ async function checkIfEmailIsTaken(res, databaseConnection, email) {
     }
 }
 
+async function deleteFile(location) {
+    try {
+        var fs = require('fs');
+
+        fs.unlink(location, function (err) {
+            if (err) return console.log(err);
+            console.log('file at ' + location + ' deleted successfully');
+        });
+    }
+
+    catch (e) {
+        console.log(e);
+        return res.status(500).json({ error: "Server error" })
+    }
+}
+
 module.exports = function (express, connectionPool) {
     let apiRouter = express.Router();
 
@@ -181,6 +197,8 @@ module.exports = function (express, connectionPool) {
                     });
                 }
 
+                let databaseConnection = await connectionPool.getConnection();
+
                 if (req.file) {
                     let imagePath = req.file.destination + req.file.filename;
                     imagePath = imagePath.replace("\\", "/");
@@ -191,14 +209,21 @@ module.exports = function (express, connectionPool) {
                         imagePath: imagePath,
                     };
 
+                    let querySelectImagePathStatement =
+                        "SELECT user.imagePath " +
+                        "FROM user " +
+                        "WHERE user.id = ?;";
+
+                    let selectedImagePath = await databaseConnection.query(querySelectImagePathStatement, paramsId);
+
+                    await deleteFile(selectedImagePath[0].imagePath);
+                    
                 } else if (!req.file) {
                     user = {
                         username: req.body.username,
                         email: req.body.email
                     };
                 }
-
-                let databaseConnection = await connectionPool.getConnection();
 
                 let isPresent = await checkIfPresent(res, databaseConnection, paramsId);
 
@@ -250,6 +275,13 @@ module.exports = function (express, connectionPool) {
                 res.status(200).json({ selectedUser });
 
             } catch (e) {
+                if (req.file) {
+                    let imagePath = req.file.destination + req.file.filename;
+                    imagePath = imagePath.replace("\\", "/");
+
+                    await deleteFile(imagePath);
+                }
+
                 console.log(e);
                 return res.status(500).json({ error: "Server error" })
             }

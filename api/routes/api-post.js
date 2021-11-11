@@ -74,6 +74,22 @@ async function checkIfCategoryExists(res, databaseConnection, id) {
     }
 }
 
+async function deleteFile(location) {
+    try {
+        var fs = require('fs');
+
+        fs.unlink(location, function (err) {
+            if (err) return console.log(err);
+            console.log('file at ' + location + ' deleted successfully');
+        });
+    }
+
+    catch (e) {
+        console.log(e);
+        return res.status(500).json({ error: "Server error" })
+    }
+}
+
 module.exports = function (express, connectionPool) {
     let apiRouter = express.Router();
 
@@ -174,7 +190,7 @@ module.exports = function (express, connectionPool) {
                 };
 
                 let databaseConnection = await connectionPool.getConnection();
-                
+
                 let doesUserExists = await checkIfUserExists(res, databaseConnection, post.userId);
 
                 if (!doesUserExists) {
@@ -218,6 +234,13 @@ module.exports = function (express, connectionPool) {
                 });
 
             } catch (e) {
+                if (req.file) {
+                    let imagePath = req.file.destination + req.file.filename;
+                    imagePath = imagePath.replace("\\", "/");
+
+                    await deleteFile(imagePath);
+                }
+                
                 console.log(e);
                 return res.status(500).json({ error: "Server error" })
             }
@@ -226,6 +249,8 @@ module.exports = function (express, connectionPool) {
     apiRouter.route("/:id")
         .put(multerUpload.single("image"), async function (req, res) {
             try {
+                let databaseConnection = await connectionPool.getConnection();
+
                 const id = req.params.id;
 
                 if (req.file) {
@@ -241,6 +266,15 @@ module.exports = function (express, connectionPool) {
                         categoryId: req.body.categoryId
                     };
 
+                    let querySelectImagePathStatement =
+                        "SELECT post.imagePath " +
+                        "FROM post " +
+                        "WHERE post.id = ?;";
+
+                    let selectedImagePath = await databaseConnection.query(querySelectImagePathStatement, id);
+
+                    await deleteFile(selectedImagePath[0].imagePath);
+
                 } else if (!req.file) {
                     post = {
                         title: req.body.title,
@@ -250,8 +284,6 @@ module.exports = function (express, connectionPool) {
                         categoryId: req.body.categoryId
                     };
                 }
-
-                let databaseConnection = await connectionPool.getConnection();
 
                 let isPresent = await checkIfPresent(res, databaseConnection, id);
 
@@ -284,7 +316,7 @@ module.exports = function (express, connectionPool) {
                     "UPDATE post SET ? " +
                     "WHERE post.id = ?";
 
-                let query = await databaseConnection.query(queryUpdateStatement, [post, id]);
+                await databaseConnection.query(queryUpdateStatement, [post, id]);
 
                 let querySelectStatement =
                     "SELECT post.id, post.title, " +
@@ -308,6 +340,13 @@ module.exports = function (express, connectionPool) {
                 });
 
             } catch (e) {
+                if (req.file) {
+                    let imagePath = req.file.destination + req.file.filename;
+                    imagePath = imagePath.replace("\\", "/");
+
+                    await deleteFile(imagePath);
+                }
+
                 console.log(e);
                 return res.status(500).json({ error: "Server error" })
             }
